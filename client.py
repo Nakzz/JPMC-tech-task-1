@@ -39,9 +39,16 @@ def getDataPoint(quote):
 
 def getRatio(price_a, price_b):
 	""" Get ratio of price_a and price_b """
-	if(price_b==0): # ZeroDivisionError handling
+	if(price_b==0): # ArithmeticException handling
 		return 
 	return price_a/price_b
+
+	# better way for error handling
+	# try { 
+    # 	return price_a / price_b;
+	# } catch (ArithmeticException e) {
+    # 	throw new ArithmeticException("Division by 0");
+	# }
 
 # Main
 if __name__ == "__main__":
