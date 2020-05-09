@@ -1,0 +1,102 @@
+From 77d5d03b2780c1855220cc4002da92efa5d93718 Mon Sep 17 00:00:00 2001
+From: Nakzz <naqibprio10@gmail.com>
+Date: Sat, 9 May 2020 17:54:23 +0000
+Subject: [PATCH 2/6] FIXED: getRatio() and getDataPoint()
+
+---
+ client.py      |  12 ++++++------
+ client.pyc     | Bin 0 -> 1366 bytes
+ client_test.py |   7 ++++---
+ 3 files changed, 10 insertions(+), 9 deletions(-)
+ create mode 100644 client.pyc
+
+diff --git a/client.py b/client.py
+index 40badcd..bfbaf85 100644
+--- a/client.py
++++ b/client.py
+@@ -31,18 +31,17 @@ N = 500
+ 
+ def getDataPoint(quote):
+ 	""" Produce all of the needed values to generate a datapoint """
+-	""" ------------- Update this function ------------- """
+ 	stock = quote['stock']
+ 	bid_price = float(quote['top_bid']['price'])
+ 	ask_price = float(quote['top_ask']['price'])
+-	price = bid_price
++	price = (bid_price + ask_price) /2
+ 	return stock, bid_price, ask_price, price
+ 
+ def getRatio(price_a, price_b):
+ 	""" Get ratio of price_a and price_b """
+-	""" ------------- Update this function ------------- """
+-	""" Also create some unit tests for this function in client_test.py """
+-	return 1
++	if(price_b==0): # ZeroDivisionError handling
++		return 
++	return price_a/price_b
+ 
+ # Main
+ if __name__ == "__main__":
+@@ -54,6 +53,7 @@ if __name__ == "__main__":
+ 		""" ----------- Update to get the ratio --------------- """
+ 		for quote in quotes:
+ 			stock, bid_price, ask_price, price = getDataPoint(quote)
++			prices[stock] = price
+ 			print "Quoted %s at (bid:%s, ask:%s, price:%s)" % (stock, bid_price, ask_price, price)
+ 
+-		print "Ratio %s" % getRatio(price, price)
++		print "Ratio %s" % getRatio(prices['ABC'], price['DEF'])
+diff --git a/client.pyc b/client.pyc
+new file mode 100644
+index 0000000000000000000000000000000000000000..65764f127a1c66a340589369e601eb8e6141e777
+GIT binary patch
+literal 1366
+zcmbtTUvJw+4ChIT6T42EG<8?M6xRYpHDH;$0RxJl|JEdHQJ_Jppa?2#6J#9|%aJ8V
+zcOFvIdCI=RK0sgk5&Eh2w!Lp8ZMS`|B=Sfe$-5s(`Twl8qQ5`>p27TCru7MtT~+{w
+zJ_Q9p{7F_2tA*Wz*jvax#6B3Z1Yk&B0u#WW6xaZ>B*HS_3YZ3*cu@Q5>;qsEa0xCH
+z?ELl@#4SJ%hL->VhHbzAhO2-+41Kr&cA{^1c`nCS;A|K03PnDIcnz=txW*p81`w}9
+zd==sih_3<C*8yCI2Zl~x2fPZn!PcVyu0MNz`W_C=3Lx!uz%-#tJEjHQ3r}{B;jk3^
+z2jL|uNd6x^d-fKI1LwwDy<SmeX)&m*+q!@6{=MGm1naktbMx@sdHydIFC&5_qJU_d
+z$nF!HO3LoJ0yk4U=u*MDbo+B}VGBOne3*JL_2C;TW9K}8shS(60mC>58=QHInBK1|
+zGs#e=MWL%B?FOhzM1w~EkrorQ+Ew}(ORQ5zPTHg{9ankjwBuV^S7j%T+wZDz($9@p
+z$910JCu?d?a*sShh9>(*MU}dc<3&B4R1PE3z%_|cmSmQJHHw~Tk>p^nkeU67SZ`2`
+zus7*XN;m0^v9?v27QGkyFSmtlI?M)}j#6y?(94P(OZWZwt!q={F}fXsvM*3LU5gla
+zEp?6F%PQl;79?%BK?W)#O*YTs8c*#3wS`QbgV3i<dz+YkhE7wd@`{ToD3VmCrJ2ip
+zos$>r351XjkTT63zmWSg4|e_vq$?CoNF%-wC$!vm@Y*U+j`xyel;&lU*t?{>;x-t4
+z$LiGSkh-vS$9|`&c(TeBN&41upkyRh$H;$vx-IL@?l0kW(gnt(E{eSWqvJVt`3OZA
+zQiB}dp{9~lBkBID*Spah$Fs2)NoxLY=C>=;5hjU5oKXltVZTJ;Xoiek994~}x19K>
+zsz<4l!)i>8*krzJ#PcRo7O`W*Ln|{SJ_65jjb`H|(pOgg!H9mX0v~lKsl7?8t>pC^
+We#2|7G?&}{hT8O3)eY5BUGIOHV<JHS
+
+literal 0
+HcmV?d00001
+
+diff --git a/client_test.py b/client_test.py
+index a608a01..aff160c 100644
+--- a/client_test.py
++++ b/client_test.py
+@@ -8,17 +8,18 @@ class ClientTest(unittest.TestCase):
+       {'top_ask': {'price': 121.68, 'size': 4}, 'timestamp': '2019-02-11 22:06:30.572453', 'top_bid': {'price': 117.87, 'size': 81}, 'id': '0.109974697771', 'stock': 'DEF'}
+     ]
+     """ ------------ Add the assertion below ------------ """
+-
++ #TODO
++  
+   def test_getDataPoint_calculatePriceBidGreaterThanAsk(self):
+     quotes = [
+       {'top_ask': {'price': 119.2, 'size': 36}, 'timestamp': '2019-02-11 22:06:30.572453', 'top_bid': {'price': 120.48, 'size': 109}, 'id': '0.109974697771', 'stock': 'ABC'},
+       {'top_ask': {'price': 121.68, 'size': 4}, 'timestamp': '2019-02-11 22:06:30.572453', 'top_bid': {'price': 117.87, 'size': 81}, 'id': '0.109974697771', 'stock': 'DEF'}
+     ]
+     """ ------------ Add the assertion below ------------ """
+-
++    # TODO
+ 
+   """ ------------ Add more unit tests ------------ """
+-
++  def test)
+ 
+ 
+ if __name__ == '__main__':
+-- 
+2.17.1
+

@@ -1,0 +1,35 @@
+From 7a6afd3476b71802bfa363f419c56de2bd3691a1 Mon Sep 17 00:00:00 2001
+From: Nakzz <naqibprio10@gmail.com>
+Date: Sat, 9 May 2020 18:01:44 +0000
+Subject: [PATCH 3/6] TODO: Change to better practice
+
+---
+ client.py | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/client.py b/client.py
+index bfbaf85..0e31055 100644
+--- a/client.py
++++ b/client.py
+@@ -39,10 +39,17 @@ def getDataPoint(quote):
+ 
+ def getRatio(price_a, price_b):
+ 	""" Get ratio of price_a and price_b """
+-	if(price_b==0): # ZeroDivisionError handling
++	if(price_b==0): # ArithmeticException handling
+ 		return 
+ 	return price_a/price_b
+ 
++	# better way for error handling
++	# try { 
++    # 	return price_a / price_b;
++	# } catch (ArithmeticException e) {
++    # 	throw new ArithmeticException("Division by 0");
++	# }
++
+ # Main
+ if __name__ == "__main__":
+ 
+-- 
+2.17.1
+

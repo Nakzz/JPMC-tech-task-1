@@ -1,0 +1,489 @@
+From 5b70da7f6227e1f53795163d603491be789ce958 Mon Sep 17 00:00:00 2001
+From: Nakzz <naqibprio10@gmail.com>
+Date: Sat, 9 May 2020 17:37:59 +0000
+Subject: [PATCH 1/6] Changes default port
+
+---
+ server.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/server.py b/server.py
+index d191771..436f07c 100644
+--- a/server.py
++++ b/server.py
+@@ -201,7 +201,7 @@ def get(req_handler, routes):
+                 req_handler.wfile.write(data)
+                 return
+ 
+-def run(routes, host = '0.0.0.0', port = 8080):
++def run(routes, host = '0.0.0.0', port = 2000): # default 8080, but my server is using code-server on 8080
+     """ Runs a class as a server whose methods have been decorated with
+         @route.
+     """
+@@ -214,7 +214,7 @@ def run(routes, host = '0.0.0.0', port = 8080):
+     thread = threading.Thread(target = server.serve_forever)
+     thread.daemon = True
+     thread.start()
+-    print 'HTTP server started on port 8080'
++    print 'HTTP server started on port ' + str(port)
+     while True:
+         from time import sleep
+         sleep(1)
+-- 
+2.17.1
+
+
+From 77d5d03b2780c1855220cc4002da92efa5d93718 Mon Sep 17 00:00:00 2001
+From: Nakzz <naqibprio10@gmail.com>
+Date: Sat, 9 May 2020 17:54:23 +0000
+Subject: [PATCH 2/6] FIXED: getRatio() and getDataPoint()
+
+---
+ client.py      |  12 ++++++------
+ client.pyc     | Bin 0 -> 1366 bytes
+ client_test.py |   7 ++++---
+ 3 files changed, 10 insertions(+), 9 deletions(-)
+ create mode 100644 client.pyc
+
+diff --git a/client.py b/client.py
+index 40badcd..bfbaf85 100644
+--- a/client.py
++++ b/client.py
+@@ -31,18 +31,17 @@ N = 500
+ 
+ def getDataPoint(quote):
+ 	""" Produce all of the needed values to generate a datapoint """
+-	""" ------------- Update this function ------------- """
+ 	stock = quote['stock']
+ 	bid_price = float(quote['top_bid']['price'])
+ 	ask_price = float(quote['top_ask']['price'])
+-	price = bid_price
++	price = (bid_price + ask_price) /2
+ 	return stock, bid_price, ask_price, price
+ 
+ def getRatio(price_a, price_b):
+ 	""" Get ratio of price_a and price_b """
+-	""" ------------- Update this function ------------- """
+-	""" Also create some unit tests for this function in client_test.py """
+-	return 1
++	if(price_b==0): # ZeroDivisionError handling
++		return 
++	return price_a/price_b
+ 
+ # Main
+ if __name__ == "__main__":
+@@ -54,6 +53,7 @@ if __name__ == "__main__":
+ 		""" ----------- Update to get the ratio --------------- """
+ 		for quote in quotes:
+ 			stock, bid_price, ask_price, price = getDataPoint(quote)
++			prices[stock] = price
+ 			print "Quoted %s at (bid:%s, ask:%s, price:%s)" % (stock, bid_price, ask_price, price)
+ 
+-		print "Ratio %s" % getRatio(price, price)
++		print "Ratio %s" % getRatio(prices['ABC'], price['DEF'])
+diff --git a/client.pyc b/client.pyc
+new file mode 100644
+index 0000000000000000000000000000000000000000..65764f127a1c66a340589369e601eb8e6141e777
+GIT binary patch
+literal 1366
+zcmbtTUvJw+4ChIT6T42EG<8?M6xRYpHDH;$0RxJl|JEdHQJ_Jppa?2#6J#9|%aJ8V
+zcOFvIdCI=RK0sgk5&Eh2w!Lp8ZMS`|B=Sfe$-5s(`Twl8qQ5`>p27TCru7MtT~+{w
+zJ_Q9p{7F_2tA*Wz*jvax#6B3Z1Yk&B0u#WW6xaZ>B*HS_3YZ3*cu@Q5>;qsEa0xCH
+z?ELl@#4SJ%hL->VhHbzAhO2-+41Kr&cA{^1c`nCS;A|K03PnDIcnz=txW*p81`w}9
+zd==sih_3<C*8yCI2Zl~x2fPZn!PcVyu0MNz`W_C=3Lx!uz%-#tJEjHQ3r}{B;jk3^
+z2jL|uNd6x^d-fKI1LwwDy<SmeX)&m*+q!@6{=MGm1naktbMx@sdHydIFC&5_qJU_d
+z$nF!HO3LoJ0yk4U=u*MDbo+B}VGBOne3*JL_2C;TW9K}8shS(60mC>58=QHInBK1|
+zGs#e=MWL%B?FOhzM1w~EkrorQ+Ew}(ORQ5zPTHg{9ankjwBuV^S7j%T+wZDz($9@p
+z$910JCu?d?a*sShh9>(*MU}dc<3&B4R1PE3z%_|cmSmQJHHw~Tk>p^nkeU67SZ`2`
+zus7*XN;m0^v9?v27QGkyFSmtlI?M)}j#6y?(94P(OZWZwt!q={F}fXsvM*3LU5gla
+zEp?6F%PQl;79?%BK?W)#O*YTs8c*#3wS`QbgV3i<dz+YkhE7wd@`{ToD3VmCrJ2ip
+zos$>r351XjkTT63zmWSg4|e_vq$?CoNF%-wC$!vm@Y*U+j`xyel;&lU*t?{>;x-t4
+z$LiGSkh-vS$9|`&c(TeBN&41upkyRh$H;$vx-IL@?l0kW(gnt(E{eSWqvJVt`3OZA
+zQiB}dp{9~lBkBID*Spah$Fs2)NoxLY=C>=;5hjU5oKXltVZTJ;Xoiek994~}x19K>
+zsz<4l!)i>8*krzJ#PcRo7O`W*Ln|{SJ_65jjb`H|(pOgg!H9mX0v~lKsl7?8t>pC^
+We#2|7G?&}{hT8O3)eY5BUGIOHV<JHS
+
+literal 0
+HcmV?d00001
+
+diff --git a/client_test.py b/client_test.py
+index a608a01..aff160c 100644
+--- a/client_test.py
++++ b/client_test.py
+@@ -8,17 +8,18 @@ class ClientTest(unittest.TestCase):
+       {'top_ask': {'price': 121.68, 'size': 4}, 'timestamp': '2019-02-11 22:06:30.572453', 'top_bid': {'price': 117.87, 'size': 81}, 'id': '0.109974697771', 'stock': 'DEF'}
+     ]
+     """ ------------ Add the assertion below ------------ """
+-
++ #TODO
++  
+   def test_getDataPoint_calculatePriceBidGreaterThanAsk(self):
+     quotes = [
+       {'top_ask': {'price': 119.2, 'size': 36}, 'timestamp': '2019-02-11 22:06:30.572453', 'top_bid': {'price': 120.48, 'size': 109}, 'id': '0.109974697771', 'stock': 'ABC'},
+       {'top_ask': {'price': 121.68, 'size': 4}, 'timestamp': '2019-02-11 22:06:30.572453', 'top_bid': {'price': 117.87, 'size': 81}, 'id': '0.109974697771', 'stock': 'DEF'}
+     ]
+     """ ------------ Add the assertion below ------------ """
+-
++    # TODO
+ 
+   """ ------------ Add more unit tests ------------ """
+-
++  def test)
+ 
+ 
+ if __name__ == '__main__':
+-- 
+2.17.1
+
+
+From 7a6afd3476b71802bfa363f419c56de2bd3691a1 Mon Sep 17 00:00:00 2001
+From: Nakzz <naqibprio10@gmail.com>
+Date: Sat, 9 May 2020 18:01:44 +0000
+Subject: [PATCH 3/6] TODO: Change to better practice
+
+---
+ client.py | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/client.py b/client.py
+index bfbaf85..0e31055 100644
+--- a/client.py
++++ b/client.py
+@@ -39,10 +39,17 @@ def getDataPoint(quote):
+ 
+ def getRatio(price_a, price_b):
+ 	""" Get ratio of price_a and price_b """
+-	if(price_b==0): # ZeroDivisionError handling
++	if(price_b==0): # ArithmeticException handling
+ 		return 
+ 	return price_a/price_b
+ 
++	# better way for error handling
++	# try { 
++    # 	return price_a / price_b;
++	# } catch (ArithmeticException e) {
++    # 	throw new ArithmeticException("Division by 0");
++	# }
++
+ # Main
+ if __name__ == "__main__":
+ 
+-- 
+2.17.1
+
+
+From dac9fdc462952ad82b141c8e555ff2a59669ff3f Mon Sep 17 00:00:00 2001
+From: Nakzz <naqibprio10@gmail.com>
+Date: Sat, 9 May 2020 19:49:27 +0000
+Subject: [PATCH 4/6] ADDED: test cases
+
+---
+ client_test.py | 74 ++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 69 insertions(+), 5 deletions(-)
+
+diff --git a/client_test.py b/client_test.py
+index aff160c..8194224 100644
+--- a/client_test.py
++++ b/client_test.py
+@@ -1,5 +1,5 @@
+ import unittest
+-from client import getDataPoint
++from client import *
+ 
+ class ClientTest(unittest.TestCase):
+   def test_getDataPoint_calculatePrice(self):
+@@ -8,19 +8,83 @@ class ClientTest(unittest.TestCase):
+       {'top_ask': {'price': 121.68, 'size': 4}, 'timestamp': '2019-02-11 22:06:30.572453', 'top_bid': {'price': 117.87, 'size': 81}, 'id': '0.109974697771', 'stock': 'DEF'}
+     ]
+     """ ------------ Add the assertion below ------------ """
+- #TODO
+-  
++    for quote in quotes:
++        self.assertEqual(getDataPoint(quote), (quote['stock'], quote['top_bid']['price'], quote['top_ask']['price'], (quote['top_bid']['price'] + quote['top_ask']['price'])/2 ))
++
++    print("test_getDataPoint_calculatePrice() done")
++
++
+   def test_getDataPoint_calculatePriceBidGreaterThanAsk(self):
+     quotes = [
+       {'top_ask': {'price': 119.2, 'size': 36}, 'timestamp': '2019-02-11 22:06:30.572453', 'top_bid': {'price': 120.48, 'size': 109}, 'id': '0.109974697771', 'stock': 'ABC'},
+       {'top_ask': {'price': 121.68, 'size': 4}, 'timestamp': '2019-02-11 22:06:30.572453', 'top_bid': {'price': 117.87, 'size': 81}, 'id': '0.109974697771', 'stock': 'DEF'}
+     ]
+     """ ------------ Add the assertion below ------------ """
+-    # TODO
++    for quote in quotes:
++        self.assertEqual(getDataPoint(quote), (quote['stock'], quote['top_bid']['price'], quote['top_ask']['price'], (quote['top_bid']['price'] + quote['top_ask']['price'])/2 ))
++  
++    print("test_getDataPoint_calculatePriceBidGreaterThanAsk() done")
+ 
+   """ ------------ Add more unit tests ------------ """
+-  def test)
++  def test_getDataPoint_checkDecimal(self):
++    quotes = [
++      {'top_ask': {'price': 119.2, 'size': 36}, 'timestamp': '2019-02-11 22:06:30.572453', 'top_bid': {'price': 120.48, 'size': 109}, 'id': '0.109974697771', 'stock': 'ABC'},
++      {'top_ask': {'price': 121.68, 'size': 4}, 'timestamp': '2019-02-11 22:06:30.572453', 'top_bid': {'price': 117.87, 'size': 81}, 'id': '0.109974697771', 'stock': 'DEF'}
++    ]
++    
++    for quote in quotes:
++        self.assertEqual(getDataPoint(quote), (quote['stock'], quote['top_bid']['price'], quote['top_ask']['price'], (quote['top_bid']['price'] + quote['top_ask']['price'])/2 ))
++  
++    print("test_getDataPoint_checkDecimal() done")
+ 
+ 
++  def test_getDataPoint_checkNull(self):
++    quotes = [
++      {'top_ask': {'price': None, 'size': 36}, 'timestamp': '2019-02-11 22:06:30.572453', 'top_bid': {'price': None, 'size': 109}, 'id': '0.109974697771', 'stock': 'ABC'},
++      {'top_ask': {'price': None, 'size': 4}, 'timestamp': '2019-02-11 22:06:30.572453', 'top_bid': {'price': None, 'size': 81}, 'id': '0.109974697771', 'stock': 'DEF'}
++    ]
++
++    for quote in quotes:
++        self.assertEqual(getDataPoint(quote),(quote['stock'], 0, 0, 0 ))
++  
++    print("test_getDataPoint_checkNull() done")
++
++
++  def test_getRatio_checkDecimal(self):
++    prices = [
++      [100,2.5],
++      [100,3],
++      [100,0.99]
++    ]
++
++    for price in prices:
++      self.assertEqual(getRatio(price[0], price[1]), float(price[0])/price[1] )
++    
++    print("test_getRatio_checkDecimal() done")
++
++
++  def test_getRatio_zeroDivision(self):
++    prices = [
++      [100,0],
++      [100,0.0],
++    ]
++
++    for price in prices:
++      self.assertEqual(getRatio(price[0], price[1]), None )
++  
++    print("test_getRatio_zeroDivision() done")
++
++
++  def test_getRatio_checkNull(self):
++    prices = [
++      [100,None],
++      [100,None],
++    ]
++
++    for price in prices:
++      self.assertEqual(getRatio(price[0], price[1]), None )
++  
++    print("test_getRatio_checkNull() done")
++
+ if __name__ == '__main__':
+     unittest.main()
+-- 
+2.17.1
+
+
+From 9165a7ca30ffb543c5594790dbb9c825023c74b3 Mon Sep 17 00:00:00 2001
+From: Nakzz <naqibprio10@gmail.com>
+Date: Sat, 9 May 2020 19:49:41 +0000
+Subject: [PATCH 5/6] FIXED: edge cases
+
+---
+ client.py | 24 ++++++++++++++----------
+ 1 file changed, 14 insertions(+), 10 deletions(-)
+
+diff --git a/client.py b/client.py
+index 0e31055..8972507 100644
+--- a/client.py
++++ b/client.py
+@@ -32,23 +32,27 @@ N = 500
+ def getDataPoint(quote):
+ 	""" Produce all of the needed values to generate a datapoint """
+ 	stock = quote['stock']
+-	bid_price = float(quote['top_bid']['price'])
+-	ask_price = float(quote['top_ask']['price'])
++	bid_price=0 
++	ask_price=0
++
++	if quote['top_bid']['price']:
++		bid_price = float(quote['top_bid']['price'])
++	
++	if quote['top_ask']['price']:
++		ask_price = float(quote['top_ask']['price'])
++
+ 	price = (bid_price + ask_price) /2
+ 	return stock, bid_price, ask_price, price
+ 
+ def getRatio(price_a, price_b):
+ 	""" Get ratio of price_a and price_b """
+-	if(price_b==0): # ArithmeticException handling
+-		return 
+-	return price_a/price_b
+ 
+ 	# better way for error handling
+-	# try { 
+-    # 	return price_a / price_b;
+-	# } catch (ArithmeticException e) {
+-    # 	throw new ArithmeticException("Division by 0");
+-	# }
++	try:
++		return float(price_a) / price_b
++	except: 
++		return
++	
+ 
+ # Main
+ if __name__ == "__main__":
+-- 
+2.17.1
+
+
+From 8e86db84672b4384b50016fb004ebe92e50b8e85 Mon Sep 17 00:00:00 2001
+From: Ajmain Naqib <naqibprio10@gmail.com>
+Date: Sat, 9 May 2020 14:52:08 -0500
+Subject: [PATCH 6/6] Create .gitignore
+
+---
+ .gitignore | 129 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 129 insertions(+)
+ create mode 100644 .gitignore
+
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 0000000..b6e4761
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1,129 @@
++# Byte-compiled / optimized / DLL files
++__pycache__/
++*.py[cod]
++*$py.class
++
++# C extensions
++*.so
++
++# Distribution / packaging
++.Python
++build/
++develop-eggs/
++dist/
++downloads/
++eggs/
++.eggs/
++lib/
++lib64/
++parts/
++sdist/
++var/
++wheels/
++pip-wheel-metadata/
++share/python-wheels/
++*.egg-info/
++.installed.cfg
++*.egg
++MANIFEST
++
++# PyInstaller
++#  Usually these files are written by a python script from a template
++#  before PyInstaller builds the exe, so as to inject date/other infos into it.
++*.manifest
++*.spec
++
++# Installer logs
++pip-log.txt
++pip-delete-this-directory.txt
++
++# Unit test / coverage reports
++htmlcov/
++.tox/
++.nox/
++.coverage
++.coverage.*
++.cache
++nosetests.xml
++coverage.xml
++*.cover
++*.py,cover
++.hypothesis/
++.pytest_cache/
++
++# Translations
++*.mo
++*.pot
++
++# Django stuff:
++*.log
++local_settings.py
++db.sqlite3
++db.sqlite3-journal
++
++# Flask stuff:
++instance/
++.webassets-cache
++
++# Scrapy stuff:
++.scrapy
++
++# Sphinx documentation
++docs/_build/
++
++# PyBuilder
++target/
++
++# Jupyter Notebook
++.ipynb_checkpoints
++
++# IPython
++profile_default/
++ipython_config.py
++
++# pyenv
++.python-version
++
++# pipenv
++#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
++#   However, in case of collaboration, if having platform-specific dependencies or dependencies
++#   having no cross-platform support, pipenv may install dependencies that don't work, or not
++#   install all needed dependencies.
++#Pipfile.lock
++
++# PEP 582; used by e.g. github.com/David-OConnor/pyflow
++__pypackages__/
++
++# Celery stuff
++celerybeat-schedule
++celerybeat.pid
++
++# SageMath parsed files
++*.sage.py
++
++# Environments
++.env
++.venv
++env/
++venv/
++ENV/
++env.bak/
++venv.bak/
++
++# Spyder project settings
++.spyderproject
++.spyproject
++
++# Rope project settings
++.ropeproject
++
++# mkdocs documentation
++/site
++
++# mypy
++.mypy_cache/
++.dmypy.json
++dmypy.json
++
++# Pyre type checker
++.pyre/
+-- 
+2.17.1
+

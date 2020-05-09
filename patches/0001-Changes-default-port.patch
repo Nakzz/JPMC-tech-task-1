@@ -1,0 +1,34 @@
+From 5b70da7f6227e1f53795163d603491be789ce958 Mon Sep 17 00:00:00 2001
+From: Nakzz <naqibprio10@gmail.com>
+Date: Sat, 9 May 2020 17:37:59 +0000
+Subject: [PATCH 1/6] Changes default port
+
+---
+ server.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/server.py b/server.py
+index d191771..436f07c 100644
+--- a/server.py
++++ b/server.py
+@@ -201,7 +201,7 @@ def get(req_handler, routes):
+                 req_handler.wfile.write(data)
+                 return
+ 
+-def run(routes, host = '0.0.0.0', port = 8080):
++def run(routes, host = '0.0.0.0', port = 2000): # default 8080, but my server is using code-server on 8080
+     """ Runs a class as a server whose methods have been decorated with
+         @route.
+     """
+@@ -214,7 +214,7 @@ def run(routes, host = '0.0.0.0', port = 8080):
+     thread = threading.Thread(target = server.serve_forever)
+     thread.daemon = True
+     thread.start()
+-    print 'HTTP server started on port 8080'
++    print 'HTTP server started on port ' + str(port)
+     while True:
+         from time import sleep
+         sleep(1)
+-- 
+2.17.1
+
