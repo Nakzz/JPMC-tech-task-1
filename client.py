@@ -32,23 +32,27 @@ N = 500
 def getDataPoint(quote):
 	""" Produce all of the needed values to generate a datapoint """
 	stock = quote['stock']
-	bid_price = float(quote['top_bid']['price'])
-	ask_price = float(quote['top_ask']['price'])
+	bid_price=0 
+	ask_price=0
+
+	if quote['top_bid']['price']:
+		bid_price = float(quote['top_bid']['price'])
+	
+	if quote['top_ask']['price']:
+		ask_price = float(quote['top_ask']['price'])
+
 	price = (bid_price + ask_price) /2
 	return stock, bid_price, ask_price, price
 
 def getRatio(price_a, price_b):
 	""" Get ratio of price_a and price_b """
-	if(price_b==0): # ArithmeticException handling
-		return 
-	return price_a/price_b
 
 	# better way for error handling
-	# try { 
-    # 	return price_a / price_b;
-	# } catch (ArithmeticException e) {
-    # 	throw new ArithmeticException("Division by 0");
-	# }
+	try:
+		return float(price_a) / price_b
+	except: 
+		return
+	
 
 # Main
 if __name__ == "__main__":
